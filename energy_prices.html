@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Energy Prices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body onload="download()" style="background-color: black">
+
+    <h1 id="hour0" style="text-align:center">
+        <span id="price0" style="font-size:20pt"></span>
+        <span id="priceText0" style="font-size:6pt"></span>
+    </h1>
+
+    <h3 style="text-align:center">
+        <span id="timer" style="font-size:4pt"></span>
+    </h3>
+
+    <!-- Add more hour spans as required -->
+    <h3 id="hour1" style="text-align: center; visibility: hidden;">
+        <span id="price1" style="font-size:4pt"></span>
+        <span id="priceText1" style="font-size:4pt"></span>
+    </h3>
+
+    <h3 id="hour2" style="text-align: center; visibility: hidden;">
+        <span id="price2" style="font-size:4pt"></span>
+        <span id="priceText2" style="font-size:4pt"></span>
+    </h3>
+
+    <script>
+        const numberOfDecimals = 2;
+        let nextHoursShown = 3; // Set how many hours you want to show
+
+        async function download() {
+            for (let i = 0; i < nextHoursShown; i++) {
+                let targetUrl = `/JustNow?lookForwardHours=${i}&isHtmlRequest=true`;
+                const response = await fetch(targetUrl);
+
+                if (response.ok) {
+                    const price = await response.json();
+                    
+                    // Cheapest hours
+                    if (price.Rank <= 8) {
+                        document.getElementById('price' + i).style.color = 'seagreen';
+                        document.getElementById('priceText' + i).style.color = 'seagreen';
+                    }
+                    // Midprice hours
+                    else if (price.Rank > 8 && price.Rank <= 16) {
+                        document.getElementById('price' + i).style.color = 'gold';
+                        document.getElementById('priceText' + i).style.color = 'gold';
+                    }
+                    // Expensive hours
+                    else {
+                        document.getElementById('price' + i).style.color = 'red';
+                        document.getElementById('priceText' + i).style.color = 'red';
+                    }
+
+                    // Set price
+                    let date = new Date(price.DateTime);
+                    let timeString = date.toTimeString().split(' ')[0].substring(0, 5);
+
+                    document.getElementById('price' + i).innerHTML = (price.PriceWithTax * 100).toFixed(numberOfDecimals);
+                    document.getElementById('priceText' + i).innerHTML = ` snt/kWh (${timeString})`;
+
+                    // Make the element visible
+                    document.getElementById('hour' + i).style.visibility = "visible";
+                } else {
+                    document.getElementById('price' + i).innerHTML = "Error loading data";
+                }
+            }
+        }
+
+        setInterval(download, 10000); // Refresh every 10 seconds
+    </script>
+</body>
+</html>
