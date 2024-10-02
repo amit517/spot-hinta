@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Spot Prices</title>
+</head>
+<body>
+  <h1>Spot Prices</h1>
+  <table>
+    <tr>
+      <th>Time</th>
+      <th>Price (snt/kWh)</th>
+    </tr>
+    <tr id="current_price">
+      <td><span id="current_time"></span></td>
+      <td><span id="current_price_value"></span></td>
+    </tr>
+    <tr id="next_hour_price">
+      <td><span id="next_hour_time"></span></td>
+      <td><span id="next_hour_price_value"></span></td>
+    </tr>
+  </table>
+  <script>
+    async function updatePrices() {
+      const response = await fetch("../data.json");
+      const data = await response.json();
+
+      document.getElementById("current_time").textContent = new Date(data.current.time).toLocaleTimeString();
+      document.getElementById("current_price_value").textContent = data.current.price.toFixed(2);
+
+      document.getElementById("next_hour_time").textContent = new Date(data.next_hour.time).toLocaleTimeString();
+      document.getElementById("next_hour_price_value").textContent = data.next_hour.price.toFixed(2);
+    }
+
+    updatePrices();
+    setInterval(updatePrices, 10000); // Update every 10 seconds
+  </script>
+</body>
+</html>
