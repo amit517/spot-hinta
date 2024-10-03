@@ -1,22 +1,45 @@
-# Use a lightweight Debian-based image
-FROM debian:bullseye-slim
-
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    g++ cmake libboost-all-dev \
-    && apt-get clean
+# Use an official C++ base image
+FROM gcc:latest
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the project files
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    cmake \
+    git \
+    libboost-all-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Clone Crow, CPR, and nlohmann/json libraries
+RUN git clone https://github.com/CrowCpp/Crow.git && \
+    git clone https://github.com/libcpr/cpr.git && \
+    git clone https://github.com/nlohmann/json.git
+
+# Build and install CPR
+WORKDIR /app/cpr
+RUN mkdir build && cd build && \
+    cmake .. && \
+    make && \
+    make install
+
+# Build and install Crow
+WORKDIR /app/Crow
+RUN mkdir build && cd build && \
+    cmake .. && \
+    make && \
+    make install
+
+# Build your application
+WORKDIR /app
 COPY . .
 
-# Build the project (assuming CMake is used)
-RUN cmake . && make
+# Compile the application
+RUN g++ -o my_app app.cpp -I /usr/local/include -L /usr/local/lib -lcpr -lCrow -lnlohmann_json
 
-# Expose the port
+# Expose the application port
 EXPOSE 18080
 
 # Command to run the application
-CMD ["./app"]
+CMD ["./my_app"]
