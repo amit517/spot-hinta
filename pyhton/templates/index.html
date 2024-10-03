@@ -55,12 +55,12 @@
           .then((response) => response.json())
           .then((data) => {
             // Convert EUR/kWh to snt/kWh by multiplying by 100
-            const currentPriceSnt = (data.current.price * 100).toFixed(2); // Convert to cents and format to 2 decimals
-            const nextPriceSnt = (data.next.price * 100).toFixed(2); // Convert to cents and format to 2 decimals
+            const currentPriceSnt = (data.current.PriceWithTax * 100).toFixed(2); // Convert to cents and format to 2 decimals
+            const nextPriceSnt = (data.next.PriceWithTax * 100).toFixed(2); // Convert to cents and format to 2 decimals
 
             // Update current hour row
             document.getElementById("current-time").innerText = new Date(
-              data.current.time
+              data.current.DateTime
             ).toLocaleString();
             document.getElementById(
               "current-price"
@@ -68,7 +68,7 @@
 
             // Update next hour row
             document.getElementById("next-time").innerText = new Date(
-              data.next.time
+              data.next.DateTime
             ).toLocaleString();
             document.getElementById(
               "next-price"

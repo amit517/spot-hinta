@@ -1,0 +1,31 @@
+version: '3'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"   # Expose Nginx on port 80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Mount the custom Nginx configuration
+    depends_on:
+      - python-app
+      - go-app
+    networks:
+      - mynetwork
+
+  python-app:
+    image: amit517/spot-hinta-python:latest
+    networks:
+      - mynetwork
+    ports:
+      - "5000"  # Expose Python app port internally
+
+  go-app:
+    image: amit517/spot-hinta-go:latest  # Assuming you have built the Go image
+    networks:
+      - mynetwork
+    ports:
+      - "8080"  # Expose Go app port internally
+
+networks:
+  mynetwork:
+    driver: bridge

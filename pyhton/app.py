@@ -11,7 +11,7 @@ def fetch_price(hour=0):
     # Extracting PriceWithTax and DateTime
     price_with_tax = data['PriceWithTax']
     time = data['DateTime']
-    return {'price': price_with_tax, 'time': time}
+    return {'PriceWithTax': price_with_tax, 'DateTime': time}
 
 # Endpoint to get the current price and next hour price
 @app.route('/get_prices')
