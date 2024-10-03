@@ -19,3 +19,12 @@ kubectl port-forward service/spot-hinta-loadbalancer 7080:80
 docker-compose up --build
 hit-> 
 http://localhost:8080/
+
+
+__
+
+## Deploy in K8s
+chmod +x deploy_and_port_forward.sh
+./deploy_and_port_forward.sh
+
+127.0.0.1:8085

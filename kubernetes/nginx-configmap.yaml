@@ -10,11 +10,22 @@ data:
     }
 
     http {
+        # Define a cache zone
+        proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=prices_cache:10m max_size=1g inactive=1h use_temp_path=off;
+
         upstream backend_prices {
             # Define the load-balancing backend for /get_prices path
             server python-app:5000;   # Python Flask app container (internal Docker name)
             server go-app:8080;       # Go app container (internal Docker name)
         }
+
+        # Custom log format to include cache status
+        log_format cache_status '$remote_addr - $remote_user [$time_local] "$request" '
+                                '$status $body_bytes_sent "$http_referer" '
+                                '"$http_user_agent" "$http_x_forwarded_for" '
+                                'Cache: $upstream_cache_status';  # Log the cache status
+
+        access_log /var/log/nginx/access.log cache_status;  # Use the custom log format
 
         server {
             listen 80;  # Listen on port 80 for HTTP requests
@@ -28,8 +39,24 @@ data:
                 proxy_set_header X-Forwarded-Proto $scheme;
             }
 
-            # Load-balance /get_prices between Python and Go apps
+            # Load-balance /get_prices between Python and Go apps with caching
             location /get_prices {
+                set $cache_key $uri;  # Set the cache key
+                set $current_time $msec;  # Get the current time in milliseconds
+                set $hourly_reset_time $current_time;  # Initialize the hourly reset time
+                set $hourly_first_request 0;  # Counter for first request of the hour
+
+                # Calculate if this is the first request of the hour
+                if ($current_time - $hourly_reset_time < 3600 * 1000) {
+                    set $hourly_first_request 1;  # Set to 1 if it's the first request
+                }
+
+                # Determine if we should bypass the cache
+                proxy_cache_bypass $hourly_first_request;  # Bypass cache on the first request of the hour
+                proxy_cache prices_cache;  # Enable caching for this location
+                proxy_cache_valid 200 1h;  # Cache successful responses for 1 hour
+                proxy_cache_key $cache_key;  # Use the cache key
+
                 proxy_pass http://backend_prices;  # Use the load-balanced backend
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
@@ -38,7 +65,6 @@ data:
             }
 
             # Optional: Add logging for easier debugging
-            access_log /var/log/nginx/access.log;
             error_log /var/log/nginx/error.log;
         }
     }
