@@ -1,2 +1,13 @@
 venv/
 myenv/
+cpp/build/CMakeFiles/cmake.check_cache
+cpp/build/CMakeFiles/CMakeConfigureLog.yaml
+cpp/build/CMakeFiles/3.30.4/CMakeCCompiler.cmake
+cpp/build/CMakeFiles/3.30.4/CMakeCXXCompiler.cmake
+cpp/build/CMakeFiles/3.30.4/CMakeDetermineCompilerABI_C.bin
+cpp/build/CMakeFiles/3.30.4/CMakeDetermineCompilerABI_CXX.bin
+cpp/build/CMakeFiles/3.30.4/CMakeSystem.cmake
+cpp/build/CMakeFiles/3.30.4/CompilerIdC/CMakeCCompilerId.c
+cpp/build/CMakeFiles/3.30.4/CompilerIdC/CMakeCCompilerId.o
+cpp/build/CMakeFiles/3.30.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
+cpp/build/CMakeFiles/3.30.4/CompilerIdCXX/CMakeCXXCompilerId.o
