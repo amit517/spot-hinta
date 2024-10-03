@@ -5,7 +5,6 @@ import (
     "fmt"
     "log"
     "net/http"
-    "time"
 )
 
 // Struct to parse API response

@@ -4,17 +4,14 @@ FROM golang:1.20 AS builder
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy go.mod and go.sum files first to leverage cached layers
-COPY go.mod go.sum ./
-
-# Download all dependencies. Dependencies will be cached if the go.mod and go.sum files are not changed
-RUN go mod download
-
 # Copy the source code into the container
-COPY app.go .  # Copy only the app.go file
+COPY app.go .
 
-# Build the Go app
-RUN go build -o my_app app.go  # Build the application from app.go
+# Copy go.mod if you have it
+COPY go.mod . 
+
+# Build the Go app with CGO disabled for static binary
+RUN CGO_ENABLED=0 go build -o my_app app.go  
 
 # Use a smaller image for the final deployment
 FROM alpine:latest
@@ -29,4 +26,4 @@ COPY --from=builder /app/my_app .
 EXPOSE 8080
 
 # Command to run the executable
-CMD ["./my_app"]
+CMD ["/root/my_app"]
