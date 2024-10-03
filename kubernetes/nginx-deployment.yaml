@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 1  # Number of replicas
+  selector:
+    matchLabels:
+      app: nginx  # Label to select Pods
+  template:
+    metadata:
+      labels:
+        app: nginx  # Must match the selector
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest  # Use the latest Nginx image
+        ports:
+        - containerPort: 80  # Nginx listens on port 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf  # Path in the container
+          subPath: nginx.conf  # Specific file in the ConfigMap
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: nginx-config  # Name of the ConfigMap (we will create this next)

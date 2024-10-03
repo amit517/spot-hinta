@@ -1,16 +1,17 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: spot-hinta-loadbalancer
-spec:
-  selector:
-    app: spot-hinta
-  ports:
-    - name: python-port
-      protocol: TCP
-      port: 80
-      targetPort: 5000 
-    - name: go-port 
-      port: 81
-      targetPort: 8080
-  type: LoadBalancer
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: spot-hinta-loadbalancer
+# spec:
+#   selector:
+#     app: spot-hinta
+#   ports:
+#     - name: python-port
+#       protocol: TCP
+#       port: 80
+#       targetPort: 5000 
+#     - name: go-port 
+#       port: 81
+#       targetPort: 8080
+#   type: LoadBalancer
+Not in use
