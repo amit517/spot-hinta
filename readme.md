@@ -15,3 +15,7 @@ Open your terminal and run the following command:
 bash
 Copy code
 kubectl port-forward service/spot-hinta-loadbalancer 7080:80
+
+docker-compose up --build
+hit-> 
+http://localhost:8080/
