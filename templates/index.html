@@ -1,38 +1,110 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Spot Prices</title>
-</head>
-<body>
-  <h1>Spot Prices</h1>
-  <table>
-    <tr>
-      <th>Time</th>
-      <th>Price (snt/kWh)</th>
-    </tr>
-    <tr id="current_price">
-      <td><span id="current_time"></span></td>
-      <td><span id="current_price_value"></span></td>
-    </tr>
-    <tr id="next_hour_price">
-      <td><span id="next_hour_time"></span></td>
-      <td><span id="next_hour_price_value"></span></td>
-    </tr>
-  </table>
-  <script>
-    async function updatePrices() {
-      const response = await fetch("../data.json");
-      const data = await response.json();
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Price Tracker</title>
+    <style>
+      /* Full-page layout */
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+      }
 
-      document.getElementById("current_time").textContent = new Date(data.current.time).toLocaleTimeString();
-      document.getElementById("current_price_value").textContent = data.current.price.toFixed(2);
+      /* Styling the table */
+      table {
+        border-collapse: collapse;
+        width: 50%;
+        background-color: #fff;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
 
-      document.getElementById("next_hour_time").textContent = new Date(data.next_hour.time).toLocaleTimeString();
-      document.getElementById("next_hour_price_value").textContent = data.next_hour.price.toFixed(2);
-    }
+      th,
+      td {
+        padding: 15px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
 
-    updatePrices();
-    setInterval(updatePrices, 10000); // Update every 10 seconds
-  </script>
-</body>
+      th {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      td {
+        font-size: 1.2em;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+    </style>
+    <script>
+      // Function to fetch and update current and next hour price data in the table
+      function updatePrices() {
+        fetch("/get_prices")
+          .then((response) => response.json())
+          .then((data) => {
+            // Convert EUR/kWh to snt/kWh by multiplying by 100
+            const currentPriceSnt = (data.current.price * 100).toFixed(2); // Convert to cents and format to 2 decimals
+            const nextPriceSnt = (data.next.price * 100).toFixed(2); // Convert to cents and format to 2 decimals
+
+            // Update current hour row
+            document.getElementById("current-time").innerText = new Date(
+              data.current.time
+            ).toLocaleString();
+            document.getElementById(
+              "current-price"
+            ).innerText = `${currentPriceSnt} snt/kWh`;
+
+            // Update next hour row
+            document.getElementById("next-time").innerText = new Date(
+              data.next.time
+            ).toLocaleString();
+            document.getElementById(
+              "next-price"
+            ).innerText = `${nextPriceSnt} snt/kWh`;
+          })
+          .catch((err) => console.error("Error fetching price data:", err));
+      }
+
+      // Update price every 10 seconds (10000 milliseconds)
+      setInterval(updatePrices, 10000);
+
+      // Initial fetch when page loads
+      window.onload = updatePrices;
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1>Electricity Price Tracker</h1>
+      <table border="1" cellpadding="10" cellspacing="0">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Price with Tax</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="current-time">Loading current time...</td>
+            <td id="current-price">Loading current price...</td>
+          </tr>
+          <tr>
+            <td id="next-time">Loading next hour time...</td>
+            <td id="next-price">Loading next hour price...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
 </html>
